@@ -4,6 +4,8 @@ version = "0.1.0"
 description = "Backend for spotpricetracker.com, responsible for fetching/updating the data and presenting an API for querying the dataset"
 authors = ["B1tWhys <skyarnold1@me.com>"]
 readme = "README.md"
+packages = [{ include = "spot_price_tracker" }]
+
 
 [tool.poetry.dependencies]
 python = "^3.13"
@@ -13,6 +15,7 @@ sqlalchemy = "^2.0.36"
 psycopg = "^3.2.3"
 typer = "^0.15.1"
 alembic = "^1.14.0"
+pydantic = "^2.10.3"
 
 [tool.poetry.group.dev.dependencies]
 black = { extras = ["d"], version = "^24.4.2" }

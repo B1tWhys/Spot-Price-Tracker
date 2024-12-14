@@ -1,1 +1,4 @@
 .idea
+dist
+example.db
+__pycache__
