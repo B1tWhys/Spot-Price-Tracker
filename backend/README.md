@@ -13,6 +13,11 @@ This directory contains the backend code for the Spot Price Tracker project. The
 2. **Poetry**:
    - Install Poetry for dependency management: https://python-poetry.org/docs/#installation
 
+3. **Database**:
+   - Set database connection options as an environment variable:
+     ```bash
+     export DATABASE_URL="sqlite:///example.db"
+     ```
 ---
 
 ## Installing Dependencies
