@@ -9,14 +9,14 @@ from spot_price_tracker.db.db import get_db
 from spot_price_tracker.db.models import SpotInstancePrice
 
 # Create FastAPI app
-app = FastAPI(
+api = FastAPI(
     title="Spot Price Tracker",
     description="API for querying AWS spot instance prices.",
     version="1.0.0",
 )
 
 
-@app.get("/current", response_model=List[SpotInstancePriceResponse])
+@api.get("/current", response_model=List[SpotInstancePriceResponse])
 def get_current_prices(
     instance_types: Optional[List[str]] = Query(
         None, description="Filter by instance types, e.g., m5.large,m5.xlarge"

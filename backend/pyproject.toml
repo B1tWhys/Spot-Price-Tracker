@@ -6,6 +6,9 @@ authors = ["B1tWhys <skyarnold1@me.com>"]
 readme = "README.md"
 packages = [{ include = "spot_price_tracker" }]
 
+[tool.poetry.scripts]
+spot_price_tracker = "spot_price_tracker.main:app"
+spt = "spot_price_tracker.main:app"
 
 [tool.poetry.dependencies]
 python = "^3.13"

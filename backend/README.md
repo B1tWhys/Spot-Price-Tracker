@@ -23,19 +23,19 @@ This directory contains the backend code for the Spot Price Tracker project. The
 ## Installing Dependencies
 
 1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
+```bash
+cd backend
+```
 
 2. Install project dependencies with Poetry:
-   ```bash
-   poetry install
-   ```
+```bash
+poetry install
+```
 
 3. Activate the virtual environment (optional, but useful for running commands directly):
-   ```bash
-   poetry shell
-   ```
+```bash
+poetry shell
+```
 
 4. Install pre-commit hooks
 ```bash
@@ -52,6 +52,11 @@ poetry run alembic upgrade head
 ```
 
 This will create the SQLite database (`example.db`) in the backend directory and create the schema.
+
+To populate the database with some test data for local development, run:
+```bash
+poetry run spot_price_tracker seed_db
+```
 
 ---
 
