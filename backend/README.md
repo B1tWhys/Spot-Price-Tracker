@@ -37,6 +37,11 @@ This directory contains the backend code for the Spot Price Tracker project. The
    poetry shell
    ```
 
+4. Install pre-commit hooks
+```bash
+poetry run pre-commit install
+```
+
 ---
 
 ## Setting Up the Database
