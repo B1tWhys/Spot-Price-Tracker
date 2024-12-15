@@ -67,9 +67,9 @@ def get_current_prices(
             region=price.region,
             availability_zone=price.availability_zone,
             timestamp=price.timestamp.isoformat(),
-            v_cores=price.instance_type_obj.v_cores,  # From InstanceType relationship
+            v_cores=price.instance_type_obj.v_cores,
+            cores=price.instance_type_obj.cores,
             sustained_clock_speed_ghz=price.instance_type_obj.sustained_clock_speed_ghz,
-            # From InstanceType relationship
         )
         for price in prices
     ]

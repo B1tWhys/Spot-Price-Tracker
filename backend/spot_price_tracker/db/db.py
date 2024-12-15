@@ -44,10 +44,10 @@ def seed_database():
 
     instance_types = [
         InstanceType(
-            instance_type="m5.large", v_cores=2, sustained_clock_speed_ghz=2.3
+            instance_type="m5.large", v_cores=2, cores=1, sustained_clock_speed_ghz=2.3
         ),
         InstanceType(
-            instance_type="m5.xlarge", v_cores=4, sustained_clock_speed_ghz=2.5
+            instance_type="m5.xlarge", v_cores=4, cores=2, sustained_clock_speed_ghz=2.5
         ),
     ]
     db.add_all(instance_types)

@@ -5,18 +5,36 @@ from pydantic.fields import Field
 
 
 class SpotInstancePriceResponse(BaseModel):
-    instance_type: str = Field(description="The type of the instance (e.g., `m5.xlarge`).", examples=["m5.xlarge"])
-    price_usd_hourly: float = Field(description="The current hourly price in USD.", examples=[123.45])
-    region: str = Field(description="The AWS region where the instance is available.", examples=["us-east-1"])
+    instance_type: str = Field(
+        description="The type of the instance (e.g., `m5.xlarge`).",
+        examples=["m5.xlarge"],
+    )
+    price_usd_hourly: float = Field(
+        description="The current hourly price in USD.", examples=[123.45]
+    )
+    region: str = Field(
+        description="The AWS region where the instance is available.",
+        examples=["us-east-1"],
+    )
     availability_zone: str = Field(
-        description="The specific availability zone within the region.", examples=["us-east-1a"]
+        description="The specific availability zone within the region.",
+        examples=["us-east-1a"],
     )
     timestamp: str = Field(
-        description="The ISO 8601 timestamp when the price was recorded.", examples=["2024-12-14T12:34:56Z"]
+        description="The ISO 8601 timestamp when the price was recorded.",
+        examples=["2024-12-14T12:34:56Z"],
     )
-    v_cores: int = Field(description="The number of virtual CPU cores for the instance type.", examples=[4])
+    v_cores: int = Field(
+        description="The number of virtual CPU cores for the instance type.",
+        examples=[4],
+    )
+    cores: int = Field(
+        description="The number of physical CPU cores for the instance type.",
+        examples=[2],
+    )
     sustained_clock_speed_ghz: float = Field(
-        description="The sustained clock speed of the instance type in GHz.", examples=[2.5]
+        description="The sustained clock speed of the instance type in GHz.",
+        examples=[2.5],
     )
 
 
@@ -32,6 +50,7 @@ class CurrentPricesResponse(BaseModel):
                     "availability_zone": "us-east-1a",
                     "timestamp": "2024-12-14T12:34:56Z",
                     "v_cores": 4,
+                    "cores": 2,
                     "sustained_clock_speed_ghz": 2.5,
                 }
             ]
