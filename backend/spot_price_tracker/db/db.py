@@ -1,11 +1,12 @@
 import os
-
 from datetime import datetime, timezone
-from sqlalchemy import create_engine
+from typing import Dict
+
+from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker, Session
+
 from spot_price_tracker.db.models import SpotInstancePrice, InstanceType
 
-# Retrieve the database URL from the environment
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if not DATABASE_URL:
@@ -86,3 +87,22 @@ def seed_database():
     db.add_all(spot_prices)
 
     db.commit()
+
+
+def get_latest_timestamps_by_region(db: Session) -> Dict[str, datetime]:
+    """
+    Fetch the latest timestamp for each region from the SpotInstancePrice table.
+
+    :param db: SQLAlchemy database session.
+    :return: A dictionary mapping region names to timestamps representing the latest value we have for that region.
+    """
+    results = (
+        db.query(
+            SpotInstancePrice.region,
+            func.max(SpotInstancePrice.timestamp).label("latest_timestamp"),
+        )
+        .group_by(SpotInstancePrice.region)
+        .all()
+    )
+
+    return {region: latest_timestamp for region, latest_timestamp in results}
