@@ -16,6 +16,7 @@ psycopg = "^3.2.3"
 typer = "^0.15.1"
 alembic = "^1.14.0"
 pydantic = "^2.10.3"
+uvicorn = "^0.33.0"
 
 [tool.poetry.group.dev.dependencies]
 black = { extras = ["d"], version = "^24.4.2" }
