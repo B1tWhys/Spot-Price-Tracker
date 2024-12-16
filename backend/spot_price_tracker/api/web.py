@@ -63,6 +63,7 @@ def get_current_prices(
     return [
         SpotInstancePriceResponse(
             instance_type=price.instance_type,
+            product_description=price.product_description,
             price_usd_hourly=price.price_usd_hourly,
             region=price.region,
             availability_zone=price.availability_zone,

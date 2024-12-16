@@ -9,6 +9,10 @@ class SpotInstancePriceResponse(BaseModel):
         description="The type of the instance (e.g., `m5.xlarge`).",
         examples=["m5.xlarge"],
     )
+    product_description: str | None = Field(
+        description="Amazon's Product Description",
+        examples=["Linux/UNIX", "Red Hat Enterprise Linux"],
+    )
     price_usd_hourly: float = Field(
         description="The current hourly price in USD.", examples=[123.45]
     )
@@ -32,7 +36,7 @@ class SpotInstancePriceResponse(BaseModel):
         description="The number of physical CPU cores for the instance type.",
         examples=[2],
     )
-    sustained_clock_speed_ghz: float = Field(
+    sustained_clock_speed_ghz: float | None = Field(
         description="The sustained clock speed of the instance type in GHz.",
         examples=[2.5],
     )
@@ -45,6 +49,7 @@ class CurrentPricesResponse(BaseModel):
             [
                 {
                     "instance_type": "m5.xlarge",
+                    "product_description": "Linux/UNIX",
                     "price_usd_hourly": 123.45,
                     "region": "us-east-1",
                     "availability_zone": "us-east-1a",

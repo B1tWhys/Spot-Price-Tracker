@@ -1,6 +1,6 @@
 import os
 from datetime import datetime, timezone
-from typing import Dict
+from typing import Dict, Set
 
 from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker, Session
@@ -41,7 +41,7 @@ def seed_database():
     """
     Seed the database with test data for local development.
     """
-    db: Session = next(get_db())  # Get a database session
+    db: Session = next(get_db())
 
     instance_types = [
         InstanceType(
@@ -57,6 +57,7 @@ def seed_database():
     spot_prices = [
         SpotInstancePrice(
             instance_type="m5.large",
+            product_description="Linux/UNIX",
             price_usd_hourly=0.034,
             region="us-east-1",
             availability_zone="us-east-1a",
@@ -64,6 +65,7 @@ def seed_database():
         ),
         SpotInstancePrice(
             instance_type="m5.large",
+            product_description="Windows",
             price_usd_hourly=0.033,
             region="us-east-1",
             availability_zone="us-east-1a",
@@ -71,6 +73,7 @@ def seed_database():
         ),
         SpotInstancePrice(
             instance_type="m5.xlarge",
+            product_description="SUSE Linux",
             price_usd_hourly=0.068,
             region="us-east-1",
             availability_zone="us-east-1b",
@@ -78,6 +81,7 @@ def seed_database():
         ),
         SpotInstancePrice(
             instance_type="m5.xlarge",
+            product_description="Linux/UNIX",
             price_usd_hourly=0.067,
             region="us-west-1",
             availability_zone="us-west-1a",
@@ -106,3 +110,13 @@ def get_latest_timestamps_by_region(db: Session) -> Dict[str, datetime]:
     )
 
     return {region: latest_timestamp for region, latest_timestamp in results}
+
+
+def get_instance_type_names(db: Session) -> Set[str]:
+    """
+    Fetch a list of all instance type names from the `instance_types` table.
+
+    :param db: SQLAlchemy database session.
+    :return: A set of instance type names (e.g., ["m5.large", "m5.xlarge"]).
+    """
+    return {row.instance_type for row in db.query(InstanceType.instance_type).all()}

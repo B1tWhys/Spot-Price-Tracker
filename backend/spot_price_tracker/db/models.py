@@ -10,7 +10,7 @@ class InstanceType(Base):
 
     instance_type = Column(String, primary_key=True, index=True)
     v_cores = Column(Integer, nullable=False)
-    sustained_clock_speed_ghz = Column(Float, nullable=False)
+    sustained_clock_speed_ghz = Column(Float, nullable=True)
     cores = Column(Integer, nullable=False)
 
     spot_prices = relationship("SpotInstancePrice", back_populates="instance_type_obj")
@@ -31,6 +31,7 @@ class SpotInstancePrice(Base):
     instance_type = Column(
         String, ForeignKey("instance_types.instance_type"), nullable=False, index=True
     )
+    product_description = Column(String, nullable=True, index=True)
     price_usd_hourly = Column(Float, nullable=False)
     region = Column(String, nullable=False, index=True)
     availability_zone = Column(String, nullable=False, index=True)
@@ -41,6 +42,7 @@ class SpotInstancePrice(Base):
     def __repr__(self):
         return (
             f"<SpotInstancePrice(instance_type='{self.instance_type}', "
+            f"product_description={self.product_description}, "
             f"price_usd_hourly={self.price_usd_hourly}, "
             f"region='{self.region}', "
             f"availability_zone='{self.availability_zone}', "

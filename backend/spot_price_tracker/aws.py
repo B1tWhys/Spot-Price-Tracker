@@ -25,7 +25,9 @@ def get_aws_regions() -> List[str]:
     """
     try:
         ec2_client = boto3.client("ec2")
-        response = ec2_client.describe_regions(AllRegions=True)
+        response = ec2_client.describe_regions(
+            AllRegions=False
+        )  # Only return regions that are enabled for my account
         regions = [region["RegionName"] for region in response["Regions"]]
         return regions
     except Exception as e:
@@ -42,30 +44,42 @@ def _get_regional_spot_price_history(
     :return: A list of SpotInstancePrice objects for the specified region.
     """
     typer.echo(f"Fetching spot price history: {query}")
+    # boto3.set_stream_logger('', logging.DEBUG)
     ec2_client = boto3.client("ec2", region_name=query.region_name)
-    params = {
-        "StartTime": query.start_time,
-        "EndTime": query.end_time or datetime.now(timezone.utc),
-    }
+
+    start_time = query.start_time.astimezone(timezone.utc)
+    end_time = query.end_time.astimezone(timezone.utc) or datetime.now(timezone.utc)
+    params = {"StartTime": start_time, "EndTime": end_time, "NextToken": ""}
     if query.instance_types:
         params["InstanceTypes"] = query.instance_types
 
     spot_price_history = []
-    paginator = ec2_client.get_paginator("describe_spot_price_history")
-    for page in paginator.paginate(**params):
-        spot_price_history.extend(page["SpotPriceHistory"])
+    while True:
+        response = ec2_client.describe_spot_price_history(**params)
+        spot_price_history.extend(response["SpotPriceHistory"])
+        if "NextToken" in response and response["NextToken"]:
+            params["NextToken"] = response["NextToken"]
+        else:
+            break
 
     spot_prices = [
         SpotInstancePrice(
             instance_type=record["InstanceType"],
+            product_description=record.get("ProductDescription", None),
             price_usd_hourly=float(record["SpotPrice"]),
             region=query.region_name,
             availability_zone=record["AvailabilityZone"],
-            timestamp=datetime.fromisoformat(record["Timestamp"]),
+            timestamp=(
+                record["Timestamp"]
+                if isinstance(record["Timestamp"], datetime)
+                else datetime.fromisoformat(record["Timestamp"])
+            ),
         )
         for record in spot_price_history
     ]
-
+    spot_prices = list(
+        filter(lambda sp: start_time <= sp.timestamp <= end_time, spot_prices)
+    )
     return spot_prices
 
 
@@ -97,10 +111,16 @@ def get_spot_price_history(
                 spot_prices.extend(region_spot_prices)
             except Exception as e:
                 raise RuntimeError(
-                    f"Error fetching spot price history for region {region}: {e}"
+                    f"Error fetching spot price history for region {region}: {e}", e
                 )
 
     return spot_prices
+
+
+def _safe_get_clock_speed(instance_type_data):
+    return instance_type_data.get("ProcessorInfo", {}).get(
+        "SustainedClockSpeedInGhz", None
+    )
 
 
 def get_instance_types() -> List[InstanceType]:
@@ -112,25 +132,31 @@ def get_instance_types() -> List[InstanceType]:
     """
     try:
         ec2_client = boto3.client("ec2")
+        typer.echo("Fetching instance types")
 
         instance_types = []
         paginator = ec2_client.get_paginator("describe_instance_types")
         for page in paginator.paginate():
             for instance_type_data in page["InstanceTypes"]:
-                instance_types.append(
-                    InstanceType(
-                        instance_type=instance_type_data["InstanceType"],
-                        v_cores=instance_type_data["VCpuInfo"]["DefaultVCpus"],
-                        cores=instance_type_data["VCpuInfo"].get(
-                            "DefaultCores",
-                            instance_type_data["VCpuInfo"]["DefaultVCpus"] // 2,
-                        ),
-                        sustained_clock_speed_ghz=instance_type_data["ProcessorInfo"][
-                            "SustainedClockSpeedInGhz"
-                        ],
+                try:
+                    instance_types.append(
+                        InstanceType(
+                            instance_type=instance_type_data["InstanceType"],
+                            v_cores=instance_type_data["VCpuInfo"]["DefaultVCpus"],
+                            cores=instance_type_data["VCpuInfo"].get(
+                                "DefaultCores",
+                                instance_type_data["VCpuInfo"]["DefaultVCpus"] // 2,
+                            ),
+                            sustained_clock_speed_ghz=_safe_get_clock_speed(
+                                instance_type_data
+                            ),
+                        )
                     )
-                )
-
+                except KeyError as e:
+                    raise KeyError(
+                        f"Failed to parse instance type data. Missing key in: {instance_type_data}",
+                        e,
+                    )
         return instance_types
     except Exception as e:
-        raise RuntimeError(f"Failed to fetch instance types: {e}")
+        raise RuntimeError(f"Failed to fetch instance types: {e}", e)
