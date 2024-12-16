@@ -26,17 +26,17 @@ class InstanceType(Base):
 
 class SpotInstancePrice(Base):
     __tablename__ = "spot_instance_prices"
+    __table_args__ = {"timescaledb_hypertable": {"time_column_name": "timestamp"}}
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    timestamp = Column(DateTime(timezone=True), primary_key=True)
     instance_type = Column(
         String, ForeignKey("instance_types.instance_type"), nullable=False, index=True
     )
-    product_description = Column(String, nullable=True, index=True)
+    product_description = Column(String, nullable=True)
     price_usd_hourly = Column(Float, nullable=False)
     region = Column(String, nullable=False, index=True)
     availability_zone = Column(String, nullable=False, index=True)
-    timestamp = Column(DateTime, nullable=False, index=True)
-
     instance_type_obj = relationship("InstanceType", back_populates="spot_prices")
 
     def __repr__(self):

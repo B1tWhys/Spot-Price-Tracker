@@ -15,12 +15,13 @@ python = "^3.13"
 boto3 = "^1.35.81"
 fastapi = "^0.115.6"
 sqlalchemy = "^2.0.36"
-psycopg = "^3.2.3"
 typer = "^0.15.1"
 alembic = "^1.14.0"
 pydantic = "^2.10.3"
 uvicorn = "^0.33.0"
 more-itertools = "^10.5.0"
+sqlalchemy-timescaledb = "^0.4.1"
+psycopg2 = "^2.9.10"
 
 [tool.poetry.group.dev.dependencies]
 black = { extras = ["d"], version = "^24.4.2" }
