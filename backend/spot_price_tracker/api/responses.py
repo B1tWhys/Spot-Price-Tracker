@@ -29,11 +29,11 @@ class SpotInstancePriceResponse(BaseModel):
         examples=["2024-12-14T12:34:56Z"],
     )
     v_cores: int = Field(
-        description="The number of virtual CPU cores for the instance type.",
+        description="The number of virtual CPU p_cores for the instance type.",
         examples=[4],
     )
     cores: int = Field(
-        description="The number of physical CPU cores for the instance type.",
+        description="The number of physical CPU p_cores for the instance type.",
         examples=[2],
     )
     sustained_clock_speed_ghz: float | None = Field(
@@ -55,7 +55,7 @@ class CurrentPricesResponse(BaseModel):
                     "availability_zone": "us-east-1a",
                     "timestamp": "2024-12-14T12:34:56Z",
                     "v_cores": 4,
-                    "cores": 2,
+                    "p_cores": 2,
                     "sustained_clock_speed_ghz": 2.5,
                 }
             ]

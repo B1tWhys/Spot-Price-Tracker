@@ -1,5 +1,7 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional, List
+from more_itertools import chunked
+from multiprocessing.pool import ThreadPool
 
 import typer
 import uvicorn
@@ -62,7 +64,7 @@ def update_data(
     """
     typer.echo("Starting the update process...")
 
-    now = datetime.now()
+    now = datetime.now(timezone.utc)
     end_time = now - timedelta(days=end_days_ago or 0)
     start_time = now - timedelta(days=start_days_ago)
 
@@ -88,28 +90,29 @@ def update_data(
                 )
             )
 
-        known_instance_types = db.get_instance_type_names(session)
-        all_instance_types = aws.get_instance_types()
-        for instance_type in all_instance_types:
-            if instance_type.instance_type not in known_instance_types:
-                typer.echo(f"Saving new instance type: {instance_type}")
-                session.add(instance_type)
-        instance_type_names = {
-            instance_type.instance_type for instance_type in all_instance_types
-        }
+        instance_types = db.get_all_instance_types(session)
+        missing_types = []
+        with ThreadPool(threads) as pool:
+            for batch in pool.imap(aws.get_instance_types, regions):
+                for instance_type in batch:
+                    if instance_type.instance_type not in instance_types:
+                        missing_types.append(instance_type)
+                        instance_types[instance_type.instance_type] = instance_type
+        if missing_types:
+            session.add_all(missing_types)
+            session.commit()
 
         # Fetch spot price data for all regions
         typer.echo(f"Fetching spot price data for regions: {regions}")
-        spot_prices = [
-            sp
-            for sp in aws.get_spot_price_history(queries, threads)
-            if sp.instance_type in instance_type_names
-        ]
+        for chunk_i, spot_price_chunk in enumerate(
+            chunked(aws.get_spot_price_history(queries, instance_types, threads), 2000)
+        ):
+            typer.echo(f"Saving chunk {chunk_i}")
+            session.bulk_save_objects(spot_price_chunk)
+            session.commit()
+            session.expunge_all()
+            typer.echo(f"Chunk {chunk_i} saved")
 
-        # Store the fetched data in the database
-        typer.echo(f"Storing {len(spot_prices)} records in the database...")
-        session.add_all(spot_prices)
-        session.commit()
         typer.echo("Update process completed successfully!")
     except Exception as e:
         typer.echo(f"An error occurred: {e}")

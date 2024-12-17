@@ -21,7 +21,7 @@ repos:
     hooks:
       - id: stylua-github
 default_stages:
-  - commit
+  - pre-commit
 default_install_hook_types:
   - pre-commit
   - commit-msg

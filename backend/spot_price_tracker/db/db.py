@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Dict, Set
 
 from sqlalchemy import create_engine, func
@@ -103,9 +103,15 @@ def get_latest_timestamps_by_region(db: Session) -> Dict[str, datetime]:
     results = (
         db.query(
             SpotInstancePrice.region,
-            func.max(SpotInstancePrice.timestamp).label("latest_timestamp"),
+            func.last(SpotInstancePrice.timestamp, SpotInstancePrice.timestamp).label(
+                "latest_timestamp"
+            ),
         )
         .group_by(SpotInstancePrice.region)
+        .where(
+            SpotInstancePrice.timestamp
+            > (datetime.now(timezone.utc) - timedelta(days=1))
+        )
         .all()
     )
 
@@ -120,3 +126,10 @@ def get_instance_type_names(db: Session) -> Set[str]:
     :return: A set of instance type names (e.g., ["m5.large", "m5.xlarge"]).
     """
     return {row.instance_type for row in db.query(InstanceType.instance_type).all()}
+
+
+def get_all_instance_types(db: Session) -> dict[str, InstanceType]:
+    ret = {}
+    for it in db.query(InstanceType):
+        ret[it.instance_type] = it
+    return ret

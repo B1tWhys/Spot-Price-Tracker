@@ -2,3 +2,5 @@
 dist
 example.db
 __pycache__
+pg-data
+pg-data*
