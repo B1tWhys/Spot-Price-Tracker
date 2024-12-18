@@ -188,10 +188,10 @@ def get_instance_types(region) -> List[InstanceType]:
                             sustained_clock_speed_ghz=_safe_get_clock_speed(
                                 instance_type_data
                             ),
-                            p_cores=instance_type_data["VCpuInfo"].get(
+                            v_cores=instance_type_data["VCpuInfo"].get(
                                 "DefaultVCpus", None
                             ),
-                            v_cores=instance_type_data["VCpuInfo"].get(
+                            p_cores=instance_type_data["VCpuInfo"].get(
                                 "DefaultCores", None
                             ),
                         )

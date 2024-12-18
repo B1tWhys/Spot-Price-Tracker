@@ -1,10 +1,11 @@
+import fnmatch
 from typing import List, Optional
 
 from fastapi import FastAPI, Depends, Query
 from sqlalchemy.orm import Session
 
 from spot_price_tracker.api.responses import SpotInstancePriceResponse
-from spot_price_tracker.db.db import get_db
+from spot_price_tracker.db.db import get_db, get_instance_type_names
 from spot_price_tracker.db.models import CurrentSpotInstancePrice
 
 # Create FastAPI app
@@ -30,7 +31,7 @@ def get_current_prices(
     db: Session = Depends(get_db),
 ):
     """
-    Fetch the latest spot instance price for each instance type in each region.
+    Fetch the latest spot instance price per instance type, availability zone and product description
     """
 
     query = db.query(CurrentSpotInstancePrice).order_by(
@@ -38,7 +39,17 @@ def get_current_prices(
     )
     # Apply filters based on query parameters
     if instance_types:
-        query = query.filter(CurrentSpotInstancePrice.instance_type.in_(instance_types))
+        all_known_instance_types = get_instance_type_names(db)
+        matched_instance_types = list(
+            filter(
+                lambda it: any(fnmatch.fnmatch(it, pat) for pat in instance_types),
+                all_known_instance_types,
+            )
+        )
+        print(f"{matched_instance_types=}")
+        query = query.filter(
+            CurrentSpotInstancePrice.instance_type.in_(matched_instance_types)
+        )
     if regions:
         query = query.filter(CurrentSpotInstancePrice.region.in_(regions))
     if product_descriptions:
@@ -47,8 +58,6 @@ def get_current_prices(
         )
 
     query = query.limit(100)
-    print(f"query = {str(query)}")
-    # Execute query
     prices = query.all()
 
     # Transform results into Pydantic models
