@@ -47,7 +47,7 @@ def upgrade() -> None:
     )
 
     op.create_table(
-        "spot_instance_prices",
+        "historical_spot_instance_prices",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("timestamp", sa.DateTime(timezone=True), nullable=False),
         sa.Column("instance_type", sa.Text(), nullable=False),
@@ -64,69 +64,69 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("timestamp", "id"),
         timescaledb_hypertable={"time_column_name": "timestamp"},
     )
-    op.create_index(
-        op.f("ix_spot_instance_prices_availability_zone"),
-        "spot_instance_prices",
-        ["availability_zone", "timestamp"],
-        unique=False,
-    )
-    op.create_index(
-        op.f("ix_spot_instance_prices_femto_usd_per_p_core_cycle"),
-        "spot_instance_prices",
-        ["femto_usd_per_p_core_cycle", "timestamp"],
-        unique=False,
-    )
-    op.create_index(
-        op.f("ix_spot_instance_prices_femto_usd_per_v_core_cycle"),
-        "spot_instance_prices",
-        ["femto_usd_per_v_core_cycle", "timestamp"],
-        unique=False,
-    )
-    op.create_index(
-        op.f("ix_spot_instance_prices_instance_type"),
-        "spot_instance_prices",
-        ["instance_type", "timestamp"],
-        unique=False,
-    )
-    op.create_index(
-        op.f("ix_spot_instance_prices_product_description"),
-        "spot_instance_prices",
-        ["product_description", "timestamp"],
-        unique=False,
-    )
-    op.create_index(
-        op.f("ix_spot_instance_prices_region"),
-        "spot_instance_prices",
-        ["region", "timestamp"],
-        unique=False,
-    )
+    # op.create_index(
+    #     op.f("ix_historical_spot_instance_prices_availability_zone"),
+    #     "historical_spot_instance_prices",
+    #     ["availability_zone", text('"timestamp" DESC')],
+    #     unique=False,
+    # )
+    # op.create_index(
+    #     op.f("ix_historical_spot_instance_prices_femto_usd_per_p_core_cycle"),
+    #     "historical_spot_instance_prices",
+    #     ["femto_usd_per_p_core_cycle", text('"timestamp" DESC')],
+    #     unique=False,
+    # )
+    # op.create_index(
+    #     op.f("ix_historical_spot_instance_prices_femto_usd_per_v_core_cycle"),
+    #     "historical_spot_instance_prices",
+    #     ["femto_usd_per_v_core_cycle", text('"timestamp" DESC')],
+    #     unique=False,
+    # )
+    # op.create_index(
+    #     op.f("ix_historical_spot_instance_prices_instance_type"),
+    #     "historical_spot_instance_prices",
+    #     ["instance_type", text('"timestamp" DESC')],
+    #     unique=False,
+    # )
+    # op.create_index(
+    #     op.f("ix_historical_spot_instance_prices_product_description"),
+    #     "historical_spot_instance_prices",
+    #     ["product_description", text('"timestamp" DESC')],
+    #     unique=False,
+    # )
+    # op.create_index(
+    #     op.f("ix_historical_spot_instance_prices_region"),
+    #     "historical_spot_instance_prices",
+    #     ["region", text('"timestamp" DESC')],
+    #     unique=False,
+    # )
     op.execute(
-        "SELECT set_chunk_time_interval('spot_instance_prices', INTERVAL '24 hours')"
+        "SELECT set_chunk_time_interval('historical_spot_instance_prices', INTERVAL '24 hours')"
     )
 
 
 def downgrade() -> None:
-    op.drop_index(
-        op.f("ix_spot_instance_prices_region"), table_name="spot_instance_prices"
-    )
-    op.drop_index(
-        op.f("ix_spot_instance_prices_product_description"),
-        table_name="spot_instance_prices",
-    )
-    op.drop_index(
-        op.f("ix_spot_instance_prices_instance_type"), table_name="spot_instance_prices"
-    )
-    op.drop_index(
-        op.f("ix_spot_instance_prices_femto_usd_per_v_core_cycle"),
-        table_name="spot_instance_prices",
-    )
-    op.drop_index(
-        op.f("ix_spot_instance_prices_femto_usd_per_p_core_cycle"),
-        table_name="spot_instance_prices",
-    )
-    op.drop_index(
-        op.f("ix_spot_instance_prices_availability_zone"),
-        table_name="spot_instance_prices",
-    )
-    op.drop_table("spot_instance_prices")
+    # op.drop_index(
+    #     op.f("ix_historical_spot_instance_prices_region"), table_name="historical_spot_instance_prices"
+    # )
+    # op.drop_index(
+    #     op.f("ix_historical_spot_instance_prices_product_description"),
+    #     table_name="historical_spot_instance_prices",
+    # )
+    # op.drop_index(
+    #     op.f("ix_historical_spot_instance_prices_instance_type"), table_name="historical_spot_instance_prices"
+    # )
+    # op.drop_index(
+    #     op.f("ix_historical_spot_instance_prices_femto_usd_per_v_core_cycle"),
+    #     table_name="historical_spot_instance_prices",
+    # )
+    # op.drop_index(
+    #     op.f("ix_historical_spot_instance_prices_femto_usd_per_p_core_cycle"),
+    #     table_name="historical_spot_instance_prices",
+    # )
+    # op.drop_index(
+    #     op.f("ix_historical_spot_instance_prices_availability_zone"),
+    #     table_name="historical_spot_instance_prices",
+    # )
+    op.drop_table("historical_spot_instance_prices")
     op.drop_table("instance_types")

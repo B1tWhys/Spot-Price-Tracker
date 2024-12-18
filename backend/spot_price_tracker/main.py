@@ -53,7 +53,7 @@ def update_data(
         help="A list of AWS regions to query. Defaults to all regions if not specified.",
     ),
     threads: int = typer.Option(
-        5,
+        30,
         "--threads",
         "-t",
         help="Number of threads to use when querying AWS for spot pricing data",

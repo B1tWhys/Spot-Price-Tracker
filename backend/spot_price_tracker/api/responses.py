@@ -40,6 +40,14 @@ class SpotInstancePriceResponse(BaseModel):
         description="The sustained clock speed of the instance type in GHz.",
         examples=[2.5],
     )
+    femto_usd_per_v_core_cycle: float | None = Field(
+        description="Cost per clock cycle, per V core in units of USD * 10^15",
+        examples=[1.234],
+    )
+    femto_usd_per_p_core_cycle: float | None = Field(
+        description="Cost per clock cycle, per physical core in units of USD * 10^15",
+        examples=[1.234],
+    )
 
 
 class CurrentPricesResponse(BaseModel):

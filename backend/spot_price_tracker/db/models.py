@@ -28,11 +28,29 @@ class InstanceType(Base):
         Numeric, Computed("v_cores * sustained_clock_speed_ghz * (NUMERIC 3.6E12)")
     )
 
-    spot_prices = relationship("SpotInstancePrice", back_populates="instance_type_obj")
+
+class CurrentSpotInstancePrice(Base):
+    __tablename__ = "current_spot_instance_prices"
+
+    instance_type = Column(
+        Text,
+        ForeignKey("instance_types.instance_type"),
+        nullable=False,
+        primary_key=True,
+    )
+    product_description = Column(String, nullable=True, primary_key=True)
+    availability_zone = Column(String, nullable=False, primary_key=True)
+    region = Column(String, nullable=False, index=True)
+    timestamp = Column(DateTime(timezone=True), index=True)
+    price_usd_hourly = Column(Numeric(11, 8), nullable=False)
+    femto_usd_per_v_core_cycle = Column(Numeric, index=True)
+    femto_usd_per_p_core_cycle = Column(Numeric, index=True)
+
+    instance_type_obj = relationship("InstanceType")
 
 
-class SpotInstancePrice(Base):
-    __tablename__ = "spot_instance_prices"
+class HistoricalSpotInstancePrice(Base):
+    __tablename__ = "historical_spot_instance_prices"
     __table_args__ = {"timescaledb_hypertable": {"time_column_name": "timestamp"}}
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -47,4 +65,4 @@ class SpotInstancePrice(Base):
     femto_usd_per_v_core_cycle = Column(Numeric, index=True)
     femto_usd_per_p_core_cycle = Column(Numeric, index=True)
 
-    instance_type_obj = relationship("InstanceType", back_populates="spot_prices")
+    instance_type_obj = relationship("InstanceType")

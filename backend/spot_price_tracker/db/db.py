@@ -5,7 +5,7 @@ from typing import Dict, Set
 from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker, Session
 
-from spot_price_tracker.db.models import SpotInstancePrice, InstanceType
+from spot_price_tracker.db.models import HistoricalSpotInstancePrice, InstanceType
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
@@ -55,7 +55,7 @@ def seed_database():
 
     # Add spot instance prices
     spot_prices = [
-        SpotInstancePrice(
+        HistoricalSpotInstancePrice(
             instance_type="m5.large",
             product_description="Linux/UNIX",
             price_usd_hourly=0.034,
@@ -63,7 +63,7 @@ def seed_database():
             availability_zone="us-east-1a",
             timestamp=datetime(2024, 12, 14, 10, 0, 0, tzinfo=timezone.utc),
         ),
-        SpotInstancePrice(
+        HistoricalSpotInstancePrice(
             instance_type="m5.large",
             product_description="Windows",
             price_usd_hourly=0.033,
@@ -71,7 +71,7 @@ def seed_database():
             availability_zone="us-east-1a",
             timestamp=datetime(2024, 12, 14, 9, 0, 0, tzinfo=timezone.utc),
         ),
-        SpotInstancePrice(
+        HistoricalSpotInstancePrice(
             instance_type="m5.xlarge",
             product_description="SUSE Linux",
             price_usd_hourly=0.068,
@@ -79,7 +79,7 @@ def seed_database():
             availability_zone="us-east-1b",
             timestamp=datetime(2024, 12, 14, 11, 0, 0, tzinfo=timezone.utc),
         ),
-        SpotInstancePrice(
+        HistoricalSpotInstancePrice(
             instance_type="m5.xlarge",
             product_description="Linux/UNIX",
             price_usd_hourly=0.067,
@@ -95,21 +95,22 @@ def seed_database():
 
 def get_latest_timestamps_by_region(db: Session) -> Dict[str, datetime]:
     """
-    Fetch the latest timestamp for each region from the SpotInstancePrice table.
+    Fetch the latest timestamp for each region from the HistoricalSpotInstancePrice table.
 
     :param db: SQLAlchemy database session.
     :return: A dictionary mapping region names to timestamps representing the latest value we have for that region.
     """
     results = (
         db.query(
-            SpotInstancePrice.region,
-            func.last(SpotInstancePrice.timestamp, SpotInstancePrice.timestamp).label(
-                "latest_timestamp"
-            ),
+            HistoricalSpotInstancePrice.region,
+            func.last(
+                HistoricalSpotInstancePrice.timestamp,
+                HistoricalSpotInstancePrice.timestamp,
+            ).label("latest_timestamp"),
         )
-        .group_by(SpotInstancePrice.region)
+        .group_by(HistoricalSpotInstancePrice.region)
         .where(
-            SpotInstancePrice.timestamp
+            HistoricalSpotInstancePrice.timestamp
             > (datetime.now(timezone.utc) - timedelta(days=1))
         )
         .all()

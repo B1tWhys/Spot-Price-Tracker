@@ -9,7 +9,7 @@ import numpy as np
 import typer
 
 from spot_price_tracker.db import db
-from spot_price_tracker.db.models import SpotInstancePrice, InstanceType
+from spot_price_tracker.db.models import HistoricalSpotInstancePrice, InstanceType
 
 running = True
 
@@ -45,7 +45,7 @@ def _get_regional_spot_price_history(
     Fetch the spot price history for a single region based on the provided query object.
 
     :param query: An instance of RegionalSpotPriceHistoryQuery containing the query parameters.
-    :return: A list of SpotInstancePrice objects for the specified region.
+    :return: A list of HistoricalSpotInstancePrice objects for the specified region.
     """
     typer.echo(f"Fetching spot price history: {query}")
     with next(db.get_db()) as db_session:
@@ -113,7 +113,7 @@ def get_spot_price_history(
     queries: List[RegionalSpotPriceHistoryQuery],
     instance_type_details: dict[str, InstanceType],
     max_threads: int = 5,
-) -> Generator[SpotInstancePrice, None, None]:
+) -> Generator[HistoricalSpotInstancePrice, None, None]:
     """
     Fetch spot price history for multiple regions.
 
@@ -121,7 +121,7 @@ def get_spot_price_history(
     :param instance_type_details: Map of string to InstanceType records that should be fetched
     :param max_threads: The maximum number of threads to use for concurrent requests.
 
-    :yields: SpotInstancePrice records
+    :yields: HistoricalSpotInstancePrice records
     """
     q = Queue(maxsize=50)
     with ThreadPoolExecutor(max_threads) as executor:
@@ -146,7 +146,7 @@ def get_spot_price_history(
                         raise e
 
                 # print(f"Yielding record: {record}")
-                yield SpotInstancePrice(**record)
+                yield HistoricalSpotInstancePrice(**record)
             typer.echo("All spot history records have been retrieved")
         except KeyboardInterrupt as e:
             global running
