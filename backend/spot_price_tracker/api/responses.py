@@ -71,6 +71,12 @@ class CurrentPricesResponse(BaseModel):
     )
 
 
+class FilterOptions(BaseModel):
+    instance_types: List[str]
+    operating_systems: List[str]
+    regions: List[str]
+
+
 class ErrorResponse(BaseModel):
     error: str = Field(
         description="A human-readable description of the error.",

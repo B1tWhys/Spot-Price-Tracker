@@ -1,3 +1,15 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+
+.collapse-arrow > .collapse-title::after {
+	top: 0.9rem;
+}
+
+.collapse[open] > :where(.collapse-content),
+.collapse-open > :where(.collapse-content),
+.collapse:focus:not(.collapse-close) > :where(.collapse-content),
+.collapse:not(.collapse-close) > :where(input[type='checkbox']:checked ~ .collapse-content),
+.collapse:not(.collapse-close) > :where(input[type='radio']:checked ~ .collapse-content) {
+	padding-bottom: 0;
+}
