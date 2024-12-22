@@ -22,7 +22,10 @@ uvicorn = "^0.33.0"
 more-itertools = "^10.5.0"
 sqlalchemy-timescaledb = "^0.4.1"
 psycopg2 = "^2.9.10"
-numpy = "^2.2.0"
+# TODO: for some reason 2.2.1 (which was released like 10 min ago) can't seem to be installed. Lock the version at 2.2.0 till numpy gets fixed
+numpy = "2.2.0"
+gunicorn = "^23.0.0"
+uvicorn-worker = "^0.2.0"
 
 [tool.poetry.group.dev.dependencies]
 black = { extras = ["d"], version = "^24.4.2" }

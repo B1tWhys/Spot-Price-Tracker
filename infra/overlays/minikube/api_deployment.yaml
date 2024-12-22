@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spt-api
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: spt-bootstrap-schema
+          imagePullPolicy: Never
+      containers:
+        - name: spt-api
+          imagePullPolicy: Never
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: spt-api
+spec:
+  type: LoadBalancer

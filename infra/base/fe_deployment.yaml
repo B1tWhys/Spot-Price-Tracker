@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spt-fe
+  labels:
+    app: spt-fe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spt-fe
+  template:
+    metadata:
+      name: spt-fe
+      labels:
+        app: spt-fe
+    spec:
+      containers:
+        - name: spt-fe
+          image: spt-frontend-image
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PUBLIC_API_URL
+              value: http://localhost:9000 # FIXME
+            - name: PRIVATE_API_URL
+              value: http://spt-api.spot-price-tracker.svc.cluster.local
+          ports:
+            - containerPort: 3000
+              name: http
+          livenessProbe:
+            httpGet:
+              port: 3000
+      restartPolicy: Always
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: spt-fe
+spec:
+  selector:
+    app: spt-fe
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: ClusterIP

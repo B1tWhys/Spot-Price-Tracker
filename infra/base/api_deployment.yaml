@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spt-api
+  labels:
+    app: spt-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spt-api
+  template:
+    metadata:
+      name: spt-api
+      labels:
+        app: spt-api
+    spec:
+      initContainers:
+        - name: spt-bootstrap-schema
+          image: spt-backend-image
+          imagePullPolicy: IfNotPresent
+          command:
+            - poetry
+            - run
+            - alembic
+            - upgrade
+            - head
+          env:
+            - name: DATABASE_URL
+              value: "timescaledb://postgres@timescaledb-0.timescaledb.spot-price-tracker.svc.cluster.local:5432/spotpricetracker" # FIXME
+      containers:
+        - name: spt-api
+          image: spt-backend-image
+          imagePullPolicy: IfNotPresent
+          command:
+            - poetry
+            - run
+            - gunicorn
+            - spot_price_tracker.api.web:api
+            - -w
+            - "4"
+            - -k
+            - uvicorn.workers.UvicornWorker
+            - --bind
+            - 0.0.0.0:8000
+          env:
+            - name: DATABASE_URL
+              value: "timescaledb://postgres@timescaledb-0.timescaledb.spot-price-tracker.svc.cluster.local:5432/spotpricetracker" # FIXME
+          ports:
+            - containerPort: 8000
+              name: http
+          readinessProbe:
+            httpGet:
+              port: 8000
+              path: /filterOptions
+            failureThreshold: 30
+            periodSeconds: 2
+          livenessProbe:
+            httpGet:
+              port: 8000
+              path: /filterOptions
+            failureThreshold: 1
+            periodSeconds: 10
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spt-api
+spec:
+  selector:
+    app: spt-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+  type: ClusterIP

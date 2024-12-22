@@ -1,10 +1,11 @@
 import { client, getFilterOptionsFilterOptionsGet } from '$lib/api-client';
 import type { LayoutLoad } from './$types';
+import { env } from '$env/dynamic/public';
 
 export const load: LayoutLoad = async ({ fetch }) => {
 	client.setConfig({
 		fetch: fetch,
-		baseUrl: 'http://localhost:8000'
+		baseUrl: env.PUBLIC_API_URL
 	});
 
 	return {

@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spt-fe
+spec:
+  template:
+    spec:
+      containers:
+        - name: spt-fe
+          imagePullPolicy: Never
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: spt-fe
+spec:
+  type: LoadBalancer
