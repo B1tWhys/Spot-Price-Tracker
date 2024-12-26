@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
         - name: spt-fe
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
 ---
 
 apiVersion: v1
