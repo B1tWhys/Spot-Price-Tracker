@@ -1,0 +1,92 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: timescaledb
+spec:
+  selector:
+    app: timescaledb
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+      name: postgres
+  clusterIP: None
+  type: ClusterIP
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: timescaledb
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 8Gi
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: timescaledb
+spec:
+  selector:
+    matchLabels:
+      app: timescaledb
+  serviceName: timescaledb
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: timescaledb
+    spec:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: Always
+      containers:
+        - name: timescaledb
+          image: timescale/timescaledb-ha:pg17
+          livenessProbe:
+            exec:
+              command:
+                - psql
+                - -h
+                - localhost
+                - -U
+                - postgres
+                - -d
+                - spotpricetracker
+                - -c
+                - "SELECT 1;"
+          ports:
+            - containerPort: 5432
+              name: postgres
+          volumeMounts:
+            - mountPath: /home/postgres/pgdata/data
+              name: timescaledb
+          env:
+            - name: POSTGRES_DB
+              value: spotpricetracker
+            - name: POSTGRES_HOST_AUTH_METHOD
+              value: "scram-sha-256"
+            - name: PGDATA
+              value: /home/postgres/pgdata/data/pgdata
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: timescale-admin-password
+                  name: timescale-admin-password
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: timescale-admin-password
+                  name: timescale-admin-password
+      volumes:
+        - name: timescaledb
+          persistentVolumeClaim:
+            claimName: timescaledb
