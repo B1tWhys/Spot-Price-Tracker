@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+  - namespace.yaml
+#  - timescaledb.yaml
+#patches:
+#  - path: fe_deployment.yaml
+#  - path: api_deployment.yaml
+namespace: spot-price-tracker
+images:
+  - name: spt-backend-image
+    newName: public.ecr.aws/b9e2c7d9/spot-price-tracker/backend
+    newTag: "73b5f80"
+  - name: spt-frontend-image
+    newName: public.ecr.aws/b9e2c7d9/spot-price-tracker/frontend
+    newTag: "1059331"
