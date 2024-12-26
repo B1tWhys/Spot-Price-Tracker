@@ -1,0 +1,45 @@
+name: Build and deploy backend
+on:
+  push:
+    branches: [master, "*-ci-test"]
+    paths:
+      - "backend/**"
+      - ".github/workflows/deploy_backend.yaml"
+env:
+  ECR_REPO: "public.ecr.aws/b9e2c7d9/spot-price-tracker/backend"
+jobs:
+  build:
+    name: Build Image
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    outputs:
+      imgTag: ${{ steps.calc_tag.outputs.tag }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Calc tag
+        id: calc_tag
+        run: |
+          short_hash="$(git rev-parse --short HEAD)"
+          echo "tag=${short_hash}" | tee $GITHUB_OUTPUT
+
+      - name: Configure AWS Creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: "arn:aws:iam::609805986527:role/spot-price-tracker-github-actions"
+          aws-region: us-east-1
+      - name: Login to Amazon ECR Public
+        id: login-ecr-public
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
+      - name: Build, tag, and push docker image to Amazon ECR Public
+        env:
+          TAG: ${{ steps.calc_tag.outputs.tag }}
+        run: |
+          cd backend
+          docker build -t $ECR_REPO:$TAG .
+          docker push $ECR_REPO:$TAG

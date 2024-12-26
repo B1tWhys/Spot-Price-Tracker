@@ -10,7 +10,8 @@ patches:
 namespace: spot-price-tracker
 images:
   - name: spt-backend-image
-    newName: spt-backend-test
-    newTag: latest
+    newName: public.ecr.aws/b9e2c7d9/spot-price-tracker/backend
+    newTag: 73b5f80
   - name: spt-frontend-image
-    newName: spt-frontend-test
+    newName: public.ecr.aws/b9e2c7d9/spot-price-tracker/frontend
+    newTag: latest # FIXME

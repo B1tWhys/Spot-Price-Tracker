@@ -7,10 +7,10 @@ spec:
     spec:
       initContainers:
         - name: spt-bootstrap-schema
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
       containers:
         - name: spt-api
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
 
 ---
 
