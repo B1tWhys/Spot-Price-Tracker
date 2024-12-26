@@ -6,7 +6,6 @@ RUN npm install
 ADD ./src /build/src
 ADD ./static /build/static
 ADD *.json *.ts *.js /build/
-ADD .svelte-kit /build/
 RUN npm run build
 ENTRYPOINT ["sh", "-o", "vi"]
 

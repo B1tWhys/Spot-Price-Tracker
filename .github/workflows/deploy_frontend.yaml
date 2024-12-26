@@ -1,12 +1,12 @@
-name: Build and deploy backend
+name: Build and deploy frontend
 on:
   push:
     branches: [master, "*-ci-test"]
     paths:
-      - "backend/**"
-      - ".github/workflows/deploy_backend.yaml"
+      - "frontend/**"
+      - ".github/workflows/deploy_frontend.yaml"
 env:
-  ECR_REPO: "public.ecr.aws/b9e2c7d9/spot-price-tracker/backend"
+  ECR_REPO: "public.ecr.aws/b9e2c7d9/spot-price-tracker/frontend"
 jobs:
   build:
     name: Build Image
@@ -40,6 +40,6 @@ jobs:
         env:
           TAG: ${{ steps.calc_tag.outputs.tag }}
         run: |
-          cd backend
+          cd frontend
           docker build -t $ECR_REPO:$TAG .
           docker push $ECR_REPO:$TAG
