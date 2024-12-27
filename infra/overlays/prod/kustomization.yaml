@@ -13,6 +13,6 @@ patches:
 - path: fe_deployment.yaml
 images:
 - name: spt-backend-image
-  newName: "6960041"
+  newName: e3e0816
 - name: spt-frontend-image
   newName: e3e0816
