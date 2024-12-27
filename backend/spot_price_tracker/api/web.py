@@ -87,9 +87,7 @@ def _get_current_prices_helper(
     order_by=None,
     asc=False,
 ):
-    query = db.query(CurrentSpotInstancePrice)  # .order_by(
-    #     CurrentSpotInstancePrice.femto_usd_per_v_core_cycle.asc()
-    # )
+    query = db.query(CurrentSpotInstancePrice)
     # Apply filters based on query parameters
     if instance_types is not None:
         if not instance_types:
