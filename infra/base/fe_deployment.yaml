@@ -19,11 +19,6 @@ spec:
         - name: spt-fe
           image: spt-frontend-image
           imagePullPolicy: IfNotPresent
-          env:
-            - name: PUBLIC_API_URL
-              value: http://localhost:9000 # FIXME
-            - name: PRIVATE_API_URL
-              value: http://spt-backend.spot-price-tracker.svc.cluster.local
           ports:
             - containerPort: 3000
               name: http

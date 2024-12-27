@@ -7,17 +7,8 @@ spec:
     spec:
       containers:
         - name: spt-fe
-          imagePullPolicy: IfNotPresent
           env:
             - name: PUBLIC_API_URL
-              value: http://localhost:9000
+              value: https://api.spotpricetracker.com
             - name: PRIVATE_API_URL
-              value: http://localhost:3000
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: spt-fe
-spec:
-  type: LoadBalancer
+              value: http://spt-backend.spot-price-tracker.svc.cluster.local

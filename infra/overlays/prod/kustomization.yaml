@@ -10,7 +10,7 @@ resources:
   - ing.yaml
 patches:
   - path: backend_deployment.yaml
-#  - path: fe_deployment.yaml
+  - path: fe_deployment.yaml
 images:
   - name: spt-backend-image
     newName: public.ecr.aws/b9e2c7d9/spot-price-tracker/backend
