@@ -57,7 +57,7 @@ jobs:
           cd infra/overlays/prod
           TAG="${{ needs.build.outputs.imgTag }}"
           git pull
-          kustomize edit set image "spt-frontend-image=$TAG"
+          kustomize edit set image "spt-frontend-image=$ECR_REPO:$TAG"
           git config --global user.name 'Github actions'
           git config --global user.email 'githubaction@spotpricetracker.com'
           git add ./kustomization.yaml
