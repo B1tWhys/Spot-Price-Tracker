@@ -6,7 +6,7 @@ resources:
   - timescaledb.yaml
 patches:
   - path: fe_deployment.yaml
-  - path: api_deployment.yaml
+  - path: backend_deployment.yaml
 namespace: spot-price-tracker
 images:
   - name: spt-backend-image

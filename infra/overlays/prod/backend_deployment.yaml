@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spt-backend
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: spt-bootstrap-schema
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  key: backend-database-url
+                  name: backend-database-url
+      containers:
+        - name: spt-backend
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  key: backend-database-url
+                  name: backend-database-url

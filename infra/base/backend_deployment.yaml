@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: spt-api
+  name: spt-backend
   labels:
-    app: spt-api
+    app: spt-backend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: spt-api
+      app: spt-backend
   template:
     metadata:
-      name: spt-api
+      name: spt-backend
       labels:
-        app: spt-api
+        app: spt-backend
     spec:
       initContainers:
         - name: spt-bootstrap-schema
@@ -25,11 +25,8 @@ spec:
             - alembic
             - upgrade
             - head
-          env:
-            - name: DATABASE_URL
-              value: "timescaledb://postgres@timescaledb-0.timescaledb.spot-price-tracker.svc.cluster.local:5432/spotpricetracker" # FIXME
       containers:
-        - name: spt-api
+        - name: spt-backend
           image: spt-backend-image
           imagePullPolicy: IfNotPresent
           command:
@@ -43,33 +40,25 @@ spec:
             - uvicorn.workers.UvicornWorker
             - --bind
             - 0.0.0.0:8000
-          env:
-            - name: DATABASE_URL
-              value: "timescaledb://postgres@timescaledb-0.timescaledb.spot-price-tracker.svc.cluster.local:5432/spotpricetracker" # FIXME
           ports:
             - containerPort: 8000
               name: http
-          readinessProbe:
-            httpGet:
-              port: 8000
-              path: /filterOptions
-            failureThreshold: 30
-            periodSeconds: 2
           livenessProbe:
             httpGet:
               port: 8000
               path: /filterOptions
             failureThreshold: 1
             periodSeconds: 10
+            initialDelaySeconds: 20
       restartPolicy: Always
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: spt-api
+  name: spt-backend
 spec:
   selector:
-    app: spt-api
+    app: spt-backend
   ports:
     - protocol: TCP
       port: 80

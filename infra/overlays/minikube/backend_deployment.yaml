@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spt-backend
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: spt-bootstrap-schema
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: DATABASE_URL
+              value: "timescaledb://postgres@timescaledb-0.timescaledb.spot-price-tracker.svc.cluster.local:5432/spotpricetracker" # FIXME
+      containers:
+        - name: spt-backend
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: DATABASE_URL
+              value: "timescaledb://postgres@timescaledb-0.timescaledb.spot-price-tracker.svc.cluster.local:5432/spotpricetracker" # FIXME
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: spt-backend
+spec:
+  type: LoadBalancer
