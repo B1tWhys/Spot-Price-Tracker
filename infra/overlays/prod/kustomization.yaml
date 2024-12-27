@@ -13,7 +13,8 @@ patches:
 - path: fe_deployment.yaml
 images:
 - name: spt-backend-image
-  newName: e3e0816
+  newName: public.ecr.aws/b9e2c7d9/spot-price-tracker/backend
+  newTag: c79325c
 - name: spt-frontend-image
   newName: public.ecr.aws/b9e2c7d9/spot-price-tracker/frontend
   newTag: c79325c
