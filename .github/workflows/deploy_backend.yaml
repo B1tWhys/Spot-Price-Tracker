@@ -1,7 +1,7 @@
 name: Build and deploy backend
 on:
   push:
-    branches: [master, "*-ci-test"]
+    branches: ["main", "*-ci-test"]
     paths:
       - "backend/**"
       - ".github/workflows/deploy_backend.yaml"

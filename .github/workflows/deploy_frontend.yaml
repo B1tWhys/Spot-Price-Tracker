@@ -1,7 +1,7 @@
 name: Build and deploy frontend
 on:
   push:
-    branches: [master, "*-ci-test"]
+    branches: ["main", "*-ci-test"]
     paths:
       - "frontend/**"
       - ".github/workflows/deploy_frontend.yaml"
