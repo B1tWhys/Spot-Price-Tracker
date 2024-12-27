@@ -15,4 +15,5 @@ images:
 - name: spt-backend-image
   newName: e3e0816
 - name: spt-frontend-image
-  newName: e3e0816
+  newName: public.ecr.aws/b9e2c7d9/spot-price-tracker/frontend
+  newTag: c79325c
