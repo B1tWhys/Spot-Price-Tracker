@@ -126,7 +126,10 @@ def get_instance_type_names(db: Session) -> Set[str]:
     :param db: SQLAlchemy database session.
     :return: A set of instance type names (e.g., ["m5.large", "m5.xlarge"]).
     """
-    return {row.instance_type for row in db.query(InstanceType.instance_type).all()}
+    return {
+        row.instance_type
+        for row in db.query(InstanceType.instance_type.distinct()).all()
+    }
 
 
 def get_all_instance_types(db: Session) -> dict[str, InstanceType]:

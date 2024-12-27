@@ -1,4 +1,3 @@
-import fnmatch
 from typing import List, Optional
 
 from fastapi import FastAPI, Depends, Query
@@ -8,7 +7,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from spot_price_tracker.api.requests import CurrentPricesQuery, CurrentPricesOrderBy
 from spot_price_tracker.api.responses import SpotInstancePriceResponse, FilterOptions
-from spot_price_tracker.db.db import get_db, get_instance_type_names
+from spot_price_tracker.db.db import get_db
 from spot_price_tracker.db.models import CurrentSpotInstancePrice, InstanceType
 
 # Create FastAPI app
@@ -92,17 +91,7 @@ def _get_current_prices_helper(
     if instance_types is not None:
         if not instance_types:
             return []
-        all_known_instance_types = get_instance_type_names(db)
-        matched_instance_types = list(
-            filter(
-                lambda it: any(fnmatch.fnmatch(it, pat) for pat in instance_types),
-                all_known_instance_types,
-            )
-        )
-        print("filtering on instance types")
-        query = query.filter(
-            CurrentSpotInstancePrice.instance_type.in_(matched_instance_types)
-        )
+        query = query.filter(CurrentSpotInstancePrice.instance_type.in_(instance_types))
     if regions is not None:
         if not regions:
             return []
@@ -110,7 +99,6 @@ def _get_current_prices_helper(
     if product_descriptions is not None:
         if not product_descriptions:
             return []
-        print("filtering on product description")
         query = query.filter(
             CurrentSpotInstancePrice.product_description.in_(product_descriptions)
         )
@@ -128,7 +116,7 @@ def _get_current_prices_helper(
 
     prices = query.all()
     # Transform results into Pydantic models
-    return [
+    response = [
         SpotInstancePriceResponse(
             instance_type=price.instance_type,
             product_description=price.product_description,
@@ -144,6 +132,7 @@ def _get_current_prices_helper(
         )
         for price in prices
     ]
+    return response
 
 
 @api.get("/filterOptions", response_model=FilterOptions)
