@@ -6,6 +6,7 @@ resources:
   - db-admin-sealed-secret.yaml
   - timescaledb.yaml
   - backend-database-url-sealed-secret.yaml
+  - data_update_cron.yaml
 patches:
   - path: backend_deployment.yaml
 #  - path: fe_deployment.yaml

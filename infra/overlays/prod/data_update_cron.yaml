@@ -1,0 +1,61 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: data-update
+spec:
+  schedule: "0 * * * *" #	Run every hour
+  startingDeadlineSeconds: 3000 # 50 min
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: spt-update-data
+              image: spt-backend-image
+              imagePullPolicy: IfNotPresent
+              command:
+                - poetry
+                - run
+                - spot_price_tracker
+                - update-data
+                - --start-days-ago
+                - "3"
+                - -t
+                - "30"
+              env:
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      key: backend-database-url
+                      name: backend-database-url
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: data-update-aws-creds
+                      key: aws-access-key-id
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: data-update-aws-creds
+                      key: aws-access-key-secret
+                - name: AWS_DEFAULT_REGION
+                  value: us-east-1
+          restartPolicy: Never
+
+---
+
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: data-update-aws-creds
+  namespace: spot-price-tracker
+spec:
+  encryptedData:
+    aws-access-key-id: "AgA2TNMK92nliDzZY3k3jHqWB127icgY/JxVmhfHqJHzellrSSgaRCnT8LCmLrfD3r0WgAHnv7d0l0ysmjJvbVkudRAHM7gGWvjKOEJXD55VcMQDzdkOXGMGlsOMLcXeWr6nJa0o2hJO/IAGPCGUbAIVL/OJ4KSs+ypjCdXN7fJkeCeS2I3X0V3D37K1cFySP5muNiDUPcKpCPbv8cmoK5QgMJcsOi6toQrOM1bDCEHMJCXcEScGXNfOZyHUJ04V2mrQjRCP3wnEbx6FVchOR9RUflXyYZvHTABPs/SDCCuMeLhASfMNJngPB2ScHsItdb83yE+Vw99joogwoNeqRjRR4q6VGt7x6sNM4DwGZhkp4eW7vUrnovVNQPOgEBjdmyqwBYMomRkkJLp3hy+KIbUIZ4lEkKmihH4/F3/AzNZ6n3nyulDyDmGZ6LAGo8m3n7zMPzGDc4pIiVBHYra7ZS3mCgWqlfOJqmXfXmc5Uv+BKJa91VvpOItAvMeQukShL0T4OLo8v6HoohvSxWFL0rdp8gqzE2Tx0grIN6U7jTmfU4dnl3hwt4oqKVYOIRNLgu1bzOAz+colrfmHN6pkVY/mGpPHIAk3EN8lQm5/1HK1K3gmYV9wOFucfSsT2xFpa/pk9sWeFavUz79jwiWxZqksRMfOosEaWy1hai20WjTvZmmS4IbPtf4SGm1D1rWfR/C8qjEfmDeuVX58RNm7GQJNj/+vDQ=="
+    aws-access-key-secret: "AgCHv0ZMATOsg0R+PvUNQqlHATGmhgjVVdBdFe9v+2Hzz70zz9+5jyXTmkkDiT7gk26SXlV0vvwmchzeYoSHBYr/Y6RL07II1a7qYkMRLN1jI4KpTDg4zxPhiJmzSvkAFfa3cTLGI4xzifMnYtBYx9flXUjFhbg/cHzg2EBg5R8PGeqjisQ4Q1bwJmnQEz/YWUOiYzQi0DquVaMqEF4izm4hW8Mpiee2vQyiTz7KBDWVISPC/iDsgxhaGsfRSyBEl6LSpZ05ZEeLniA2oaQzQe2Q04ep0ZVOw+ehMpKV9nkzcromufO2OtTTFUW4lErysNj+9vtyoxH1DQQU6dWHNqlbzlrQetPjg9Xbnwy212grj5rAjoj5/BUUSMrBp2QSZAI+MU0n2d495zUCTvIQLjQy5VvkB4TFfxcHkTB80GuFtxVNQT1zoMDkoHYhoURq8oyCdFW+5PE97BlHrVYY+6p0BRtIQGIsw+v5eZndu8tkLWwWcbjjJZKhkwxkTkobFrBlWwHM4x/hK7p3ioBl1HDNFKENpCbEsetmT1DpjiAp/nhZWhVVh8PNAZH7fWiJPR2REErI4pRryMd/ZQniLdA2SVjCrvPTPCR8dOg0daID91diS5DRfCyhaXkDE5aJNHUajhAEwRcmkEfoF3wC8t1bCXmWXzfijRmaBouRFYJ+ajW9YQUSbKiyM1hbEhQVcvCxk7NgiJ9ZMfrY4tIs0jAOjELcWpg16fLXk5nEevECqlp2J4Qv9pMc"
+  template:
+    metadata:
+      creationTimestamp: null
+      name: data-update-aws-creds
+      namespace: spot-price-tracker
