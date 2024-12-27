@@ -14,7 +14,7 @@ patches:
 images:
 - name: spt-backend-image
   newName: public.ecr.aws/b9e2c7d9/spot-price-tracker/backend
-  newTag: c79325c
+  newTag: fe68955
 - name: spt-frontend-image
   newName: public.ecr.aws/b9e2c7d9/spot-price-tracker/frontend
   newTag: fe68955
