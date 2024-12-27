@@ -7,7 +7,7 @@ spec:
     - websecure
   routes:
     - kind: Rule
-      match: "HostSNI(`spotpricetracker.com`, `www.spotpricetracker.com`)"
+      match: "Host(`spotpricetracker.com`)"
       services:
         - name: spt-fe
           port: 80
@@ -22,7 +22,7 @@ spec:
     - websecure
   routes:
     - kind: Rule
-      match: "HostSNI(`api.spotpricetracker.com`)"
+      match: "Host(`api.spotpricetracker.com`)"
       services:
         - name: spt-be
           port: 80
